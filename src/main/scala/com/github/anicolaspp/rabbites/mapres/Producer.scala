@@ -24,11 +24,10 @@ object Producer {
         val record = new ProducerRecord[String, String](TOPIC, message)
 
         producer.send(record)
-
+        
       } catch {
         case t: Throwable => println(t)
       }
-
     }
 
 

@@ -9,8 +9,8 @@ sealed trait ReceiverPool {
 }
 
 object ReceiverPool {
-  def apply(channel: Channel, queueName: String, producer: Producer): ReceiverPool = new ReceiverPool {
+  def apply(channel: Channel, queueName: String, producerSupplier: () => Producer): ReceiverPool = new ReceiverPool {
     override def start(receivers: Int): Unit =
-      (1 to receivers).foreach { _ => Receiver(channel, queueName).runWith(producer) }
+      (1 to receivers).foreach { _ => Receiver(channel, queueName).runWith(producerSupplier.apply()) }
   }
 }

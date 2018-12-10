@@ -10,10 +10,10 @@ object App {
   def main(args: Array[String]): Unit =
     Configuration
       .parse(args)
-      .map(getPool)
+      .map(getReceiversPool)
       .foreach { case (pool, conf) => pool.start(conf.workers) }
-  
-  private def getPool(conf: Configuration): (ReceiverPool, Configuration) =
+
+  private def getReceiversPool(conf: Configuration): (ReceiverPool, Configuration) =
     (ReceiverPool(getChannelForHost(conf.rabbitEndPoint), conf.queueName, () => Producer(conf.stream, conf.topic)), conf)
 
   private def getChannelForHost(host: String) = {

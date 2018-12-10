@@ -17,9 +17,9 @@ object Producer {
     private val TOPIC = streamName + ":" + topic
 
     override def produce(message: String): Try[RecordMetadata] = 
-      new ProducerRecord[String, String](TOPIC, message).sendWith(producer())
+      new ProducerRecord[String, String](TOPIC, message).sendWith(producer)
     
-    private def producer() = {
+    private lazy val producer = {
       val props = new Properties()
       props.setProperty("batch.size", "16384")
       props.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")

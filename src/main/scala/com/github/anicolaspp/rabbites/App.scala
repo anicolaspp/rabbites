@@ -1,6 +1,6 @@
 package com.github.anicolaspp.rabbites
 
-import com.github.anicolaspp.rabbites.receiver.ReceiverPool
+import com.github.anicolaspp.rabbites.mq.ReceiverPool
 import com.rabbitmq.client.ConnectionFactory
 
 

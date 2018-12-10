@@ -2,21 +2,18 @@ package com.github.anicolaspp.rabbites.mapres
 
 import java.util.Properties
 
-import org.apache.kafka.clients.producer.ProducerRecord
-
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
 sealed trait Producer {
-
   def produce(message: String): Unit
-
 }
-
 
 object Producer {
 
-  private lazy val TOPIC = "/user/mapr/streams/bridge:hello"
+  def apply(streamName: String, topic: String): Producer = new Producer {
 
-  def apply(): Producer = new Producer {
+    private val TOPIC = streamName + ":" + topic
+
     override def produce(message: String): Unit = {
       
       try {
@@ -29,10 +26,7 @@ object Producer {
         case t: Throwable => println(t)
       }
     }
-
-
-    import org.apache.kafka.clients.producer.KafkaProducer
-
+    
     private def getProducer() = {
       val props = new Properties()
       props.setProperty("batch.size", "16384")

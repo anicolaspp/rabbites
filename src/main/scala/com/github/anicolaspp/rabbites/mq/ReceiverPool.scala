@@ -3,7 +3,6 @@ package com.github.anicolaspp.rabbites.mq
 import com.github.anicolaspp.rabbites.mapres.Producer
 import com.rabbitmq.client.Channel
 
-
 sealed trait ReceiverPool {
   def start(receivers: Int): Unit
 }

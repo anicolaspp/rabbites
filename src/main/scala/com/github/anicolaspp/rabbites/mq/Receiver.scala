@@ -23,31 +23,20 @@ object Receiver {
       channel.basicQos(1)
 
       channel.queueDeclare(queueName, false, false, false, null)
-//      channel.basicConsume(queueName, false, deliverCallback(channel, receiverId, producer), _ => {})
 
       channel.basicConsume(queueName, false, new DeliverCallback {
         override def handle(consumerTag: String, delivery: Delivery): Unit = {
           val message = new String(delivery.getBody, "UTF-8")
 
-                println(s" [x] [$id] Received $message")
+          println(s" [x] [${id()}] Received $message")
 
-                producer.produce(message)
+          producer.produce(message)
 
-                channel.basicAck(delivery.getEnvelope.getDeliveryTag, false)
+          channel.basicAck(delivery.getEnvelope.getDeliveryTag, false)
         }
       }, new CancelCallback {
-        override def handle(consumerTag: String): Unit = ???
+        override def handle(consumerTag: String): Unit = {}
       })
     }
-//
-//    private def deliverCallback(channel: Channel, id: Int, producer: Producer): DeliverCallback = (_, delivery) => {
-//      val message = new String(delivery.getBody, "UTF-8")
-//
-//      println(s" [x] [$id] Received $message")
-//
-//      producer.produce(message)
-//
-//      channel.basicAck(delivery.getEnvelope.getDeliveryTag, false)
-//    }
   }
 }

@@ -1,11 +1,14 @@
 package com.github.anicolaspp.rabbites.mapres
 
 import java.util.Properties
+import java.util.concurrent.Future
 
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
+
+import scala.util.Try
 
 sealed trait Producer {
-  def produce(message: String): Unit
+  def produce(message: String): Try[RecordMetadata]
 }
 
 object Producer {
@@ -14,19 +17,16 @@ object Producer {
 
     private val TOPIC = streamName + ":" + topic
 
-    override def produce(message: String): Unit = {
-      
-      try {
-        val producer = getProducer()
-        val record = new ProducerRecord[String, String](TOPIC, message)
+    override def produce(message: String): Try[RecordMetadata] = Try {
 
-        producer.send(record)
-        
-      } catch {
-        case t: Throwable => println(t)
-      }
+      val producer = getProducer()
+      val record = new ProducerRecord[String, String](TOPIC, message)
+
+      //blocking here is not important since this entire process in running on a different thread.
+      producer.send(record).get()
     }
-    
+
+
     private def getProducer() = {
       val props = new Properties()
       props.setProperty("batch.size", "16384")

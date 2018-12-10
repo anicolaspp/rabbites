@@ -10,7 +10,7 @@ object App {
 
   def main(args: Array[String]): Unit = ReceiverPool(getChannelForHost("localhost"), QUEUE_NAME).start(5)
 
-  def getChannelForHost(host: String) = {
+  private def getChannelForHost(host: String) = {
     val factory = new ConnectionFactory()
 
     factory.setHost(host)

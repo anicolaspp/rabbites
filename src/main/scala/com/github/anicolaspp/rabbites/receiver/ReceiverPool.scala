@@ -1,4 +1,4 @@
-package com.github.anicolaspp.rabbit.receiver
+package com.github.anicolaspp.rabbites.receiver
 
 import com.rabbitmq.client.Channel
 

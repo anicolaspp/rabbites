@@ -1,37 +1,23 @@
 package com.github.anicolaspp.rabbit
 
+import com.github.anicolaspp.rabbit.receiver.ReceiverPool
 import com.rabbitmq.client.ConnectionFactory
-import com.rabbitmq.client.Connection
-import com.rabbitmq.client.Channel
 
 
 object App {
 
   private val QUEUE_NAME = "hello"
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = ReceiverPool(getChannelForHost("localhost"), QUEUE_NAME).start(5)
+
+  def getChannelForHost(host: String) = {
     val factory = new ConnectionFactory()
 
-    factory.setHost("localhost")
-
+    factory.setHost(host)
     val connection = factory.newConnection()
 
-    val channel = connection.createChannel()
-
-    channel.queueDeclare(QUEUE_NAME, false, false, false, null)
-
-    (1 to 1000).foreach {i =>
-      val message = s"Message [$i]"
-
-      channel.basicPublish("", QUEUE_NAME, null, message.getBytes("UTF-8"))
-
-      println(" [x] Sent '" + message + "'")
-    }
-
-    
-    channel.close()
-
-    connection.close()
+    connection.createChannel()
   }
-
 }
+
+

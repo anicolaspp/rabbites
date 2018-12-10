@@ -5,20 +5,20 @@ import com.rabbitmq.client.{Channel, DeliverCallback, Delivery}
 
 import scala.util.{Failure, Success}
 
-class RabbitMessageProcessor private[this](producer: Producer, channel: Channel, id: Int) extends DeliverCallback {
+class RabbitMessageProcessor(producer: Producer, channel: Channel, id: Int) extends DeliverCallback {
   override def handle(consumerTag: String, delivery: Delivery): Unit = {
     val message = new String(delivery.getBody, "UTF-8")
 
-    println(s" [x] [${id()}] Received $message")
+    println(s" [x] [$id] Received $message")
 
     producer.produce(message) match {
       case Success(metadata) => {
-        println(s" [x] [${id()}] Metadata $metadata")
+        println(s" [x] [$id] TOPIC:${metadata.topic()}; OFFSET: ${metadata.offset()}")
 
         channel.basicAck(delivery.getEnvelope.getDeliveryTag, false)
       }
       case Failure(exception) => {
-        println(s" [x] [${id()}] Error $exception")
+        println(s" [x] [$id] Error $exception")
 
         channel.basicReject(delivery.getEnvelope.getDeliveryTag, true)
       }

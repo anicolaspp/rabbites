@@ -1,7 +1,6 @@
 package com.github.anicolaspp.rabbites.mapres
 
 import java.util.Properties
-import java.util.concurrent.Future
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
 
@@ -17,17 +16,10 @@ object Producer {
 
     private val TOPIC = streamName + ":" + topic
 
-    override def produce(message: String): Try[RecordMetadata] = Try {
-
-      val producer = getProducer()
-      val record = new ProducerRecord[String, String](TOPIC, message)
-
-      //blocking here is not important since this entire process in running on a different thread.
-      producer.send(record).get()
-    }
-
-
-    private def getProducer() = {
+    override def produce(message: String): Try[RecordMetadata] = 
+      new ProducerRecord[String, String](TOPIC, message).sendWith(producer())
+    
+    private def producer() = {
       val props = new Properties()
       props.setProperty("batch.size", "16384")
       props.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
@@ -36,5 +28,9 @@ object Producer {
 
       new KafkaProducer[String, String](props)
     }
+  }
+
+  implicit class RichProducerRecord[A, B](record: ProducerRecord[A, B]) {
+    def sendWith(producer: KafkaProducer[A, B]) =  Try { producer.send(record).get() }
   }
 }

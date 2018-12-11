@@ -1,7 +1,7 @@
 # RabbitES
 A small and direct bridge between RabbitMQ and MapR-ES
 
-This is project is built using `Maven`. 
+This project is built using `Maven`. 
 
 ```bash
 mvn clean compile package

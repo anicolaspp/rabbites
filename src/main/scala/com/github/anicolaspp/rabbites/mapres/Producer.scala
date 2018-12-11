@@ -2,6 +2,7 @@ package com.github.anicolaspp.rabbites.mapres
 
 import java.util.Properties
 
+import com.github.anicolaspp.rabbites.syntax.Predef._
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
 
 import scala.util.Try
@@ -16,9 +17,9 @@ object Producer {
 
     private val TOPIC = streamName + ":" + topic
 
-    override def produce(message: String): Try[RecordMetadata] = 
+    override def produce(message: String): Try[RecordMetadata] =
       new ProducerRecord[String, String](TOPIC, message).sendWith(producer)
-    
+
     private lazy val producer = {
       val props = new Properties()
       props.setProperty("batch.size", "16384")
@@ -28,9 +29,5 @@ object Producer {
 
       new KafkaProducer[String, String](props)
     }
-  }
-
-  implicit class RichProducerRecord[A, B](record: ProducerRecord[A, B]) {
-    def sendWith(producer: KafkaProducer[A, B]) =  Try { producer.send(record).get() }
   }
 }

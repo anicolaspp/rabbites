@@ -1,7 +1,9 @@
 package com.github.anicolaspp.rabbites.mq
 
 import com.github.anicolaspp.rabbites.mapres.Producer
-import com.rabbitmq.client.{CancelCallback, Channel}
+import com.rabbitmq.client.{Channel, DeliverCallback, Delivery}
+
+import scala.util.{Failure, Success}
 
 sealed trait Receiver {
   def id(): Int
@@ -24,12 +26,27 @@ object Receiver {
 
       channel.queueDeclare(queueName, false, false, false, null)
 
-      channel.basicConsume(queueName, false, deliveryProcessing(producer), new CancelCallback {
-        override def handle(consumerTag: String): Unit = {}
-      })
+      channel.basicConsume(queueName, false, callBack(producer, channel, id()), (_: String) => {})
     }
+    
+    private def callBack(producer: Producer, channel: Channel, id: Int): DeliverCallback = (_: String, delivery: Delivery) => {
+      val message = new String(delivery.getBody, "UTF-8")
 
-    private def deliveryProcessing(producer: Producer) = RabbitMessageProcessor(producer, channel, id())
+      println(s" [x] [$id] Received $message")
+
+      producer.produce(message) match {
+        case Success(metadata) => {
+          println(s" [x] [$id] TOPIC:${metadata.topic()}; OFFSET: ${metadata.offset()}")
+
+          channel.basicAck(delivery.getEnvelope.getDeliveryTag, false)
+        }
+        case Failure(exception) => {
+          println(s" [x] [$id] Error $exception")
+
+          channel.basicReject(delivery.getEnvelope.getDeliveryTag, true)
+        }
+      }
+    }
   }
 }
 

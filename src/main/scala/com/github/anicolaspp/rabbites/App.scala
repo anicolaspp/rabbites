@@ -3,7 +3,8 @@ package com.github.anicolaspp.rabbites
 import com.github.anicolaspp.rabbites.conf.Configuration
 import com.github.anicolaspp.rabbites.mapres.Producer
 import com.github.anicolaspp.rabbites.mq.ReceiverPool
-import com.rabbitmq.client.ConnectionFactory
+import com.rabbitmq.client.{Channel, ConnectionFactory}
+import syntax.Predef._
 
 object App {
 
@@ -16,13 +17,10 @@ object App {
   private def getReceiversPool(conf: Configuration): (ReceiverPool, Configuration) =
     (ReceiverPool(getChannelForHost(conf.rabbitEndPoint), conf.queueName, () => Producer(conf.stream, conf.topic)), conf)
 
-  private def getChannelForHost(host: String) = {
-    val factory = new ConnectionFactory()
-
-    factory.setHost(host)
-    val connection = factory.newConnection()
-
-    connection.createChannel()
-  }
+  private def getChannelForHost(host: String): Channel =
+    new ConnectionFactory()
+      .host(host)
+      .newConnection()
+      .createChannel()
 }
 

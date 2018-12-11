@@ -1,5 +1,6 @@
 package com.github.anicolaspp.rabbites.syntax
 
+import com.rabbitmq.client.ConnectionFactory
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
 import scala.util.Try
@@ -10,4 +11,11 @@ object Predef {
     def sendWith(producer: KafkaProducer[A, B]) = Try { producer.send(record).get() }
   }
 
+  implicit class RickFactory(factory: ConnectionFactory) {
+    def host(host: String): ConnectionFactory = {
+      factory.setHost(host)
+
+      factory
+    }
+  }
 }

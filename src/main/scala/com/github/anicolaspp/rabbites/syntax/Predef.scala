@@ -11,7 +11,7 @@ object Predef {
     def sendWith(producer: KafkaProducer[A, B]) = Try { producer.send(record).get() }
   }
 
-  implicit class RickFactory(factory: ConnectionFactory) {
+  implicit class RichFactory(factory: ConnectionFactory) {
     def host(host: String): ConnectionFactory = {
       factory.setHost(host)
 
